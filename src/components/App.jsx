@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { ThreeDots } from 'react-loader-spinner';
 import getData from './Loader/loader';
 import Searchbar from './Searchbar/Searchbar';
@@ -9,29 +9,19 @@ import Button from './Button/Button';
 import style from './App.module.css';
 
 export const App = () => {
-
   const [isLoading, setIsLoading] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [searchInput, setSearchInput] = useState(false);
-  const [page, setPage] = useState(false);
-  const [hits, setHits] = useState(false);
-  const [modalImage, setModalImage] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
+  const [page, setPage] = useState(()=>1);
+  const [hits, setHits] = useState([]);
+  const [modalImage, setModalImage] = useState('');
 
-  useEffect(() => {
-    getImageList()
-  }, [getImageList])
-  
-  useEffect(() => {
-    getImageList()
-    setPage(1)
-  }, [searchInput,getImageList])
-  
   
   const getImageList = async () => {
     try {
       setIsLoading(true);
       const images = await getData(searchInput, page);
-      setHits(images.hits)
+      setHits(images.hits);
     } catch (error) {
       console.error(error);
     } finally {
@@ -39,11 +29,22 @@ export const App = () => {
     }
   };
 
+  useEffect(() => {
+    getImageList();
+  }, []);
+
+  useEffect(() => {
+    console.log('object');
+    setHits([])
+    getImageList();
+    setPage(1);
+  }, [searchInput]);
+
   const onSubmit = data => {
     if (data === searchInput) {
       return;
     }
-    setPage(1)
+    setPage(1);
     setSearchInput(data);
   };
 
@@ -57,39 +58,46 @@ export const App = () => {
     setIsCreateModalOpen(true);
   };
 
-  const loadMore = async () => {
-    setIsLoading(true);
-    await setPage(page + 1);
-    try {
-      await getData(searchInput, page).then(data => {
-     setHits([...hits, ...data.hits]);
-  setPage(page + 1);
-      });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
+  useEffect(() => {
+    const loadMore = async () => {
+      setIsLoading(true);
+      try {
+        await getData(searchInput, page).then(data => {
+          setHits([...hits, ...data.hits]);
+          // setPage(page + 1);
+        });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    searchInput && loadMore()
+  }, [page]);
+
+  const onLoadMoreClick = () => {
+    setPage(page + 1);
+    console.log("111");
   };
 
-
-
   return (
-      <div className={style.App}>
-        <Searchbar onSubmit={onSubmit} />
-        {hits && (
-          <ImageGallery images={hits} onClick={openModal} />
-        )}
-        {hits !== null && !isLoading && <Button onClick={loadMore} />}
-        {isLoading && <ThreeDots color="#3f51b5" wrapperStyle={{ marginLeft: "auto", marginRight: "auto"}} />}
-        {isCreateModalOpen && (
-          <Modal largeImage={modalImage} onClose={closeModal} />
-        )}
-      </div>
-    );
-}
+    <div className={style.App}>
+      <Searchbar onSubmit={onSubmit} />
+      {hits && <ImageGallery images={hits} onClick={openModal} />}
+      {hits !== null && !isLoading && <Button onClick={onLoadMoreClick} />}
+      {isLoading && (
+        <ThreeDots
+          color="#3f51b5"
+          wrapperStyle={{ marginLeft: 'auto', marginRight: 'auto' }}
+        />
+      )}
+      {isCreateModalOpen && (
+        <Modal largeImage={modalImage} onClose={closeModal} />
+      )}
+    </div>
+  );
+};
 
-// export default App;
 // export class App extends React.Component {
 //   state = {
 //     isLoading: false,
@@ -102,7 +110,7 @@ export const App = () => {
 
 //   componentDidMount() {
 //     this.getImageList();
-    
+
 //   }
 
 //   componentDidUpdate(prevProps, prevState) {

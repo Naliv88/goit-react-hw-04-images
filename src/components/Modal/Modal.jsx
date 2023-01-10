@@ -3,26 +3,28 @@ import PropTypes from 'prop-types';
 
 import styles from './Modal.module.css';
 
-const Modal = ({largeImage}, onClose) => {
+const Modal = ({ largeImage }, onClose) => {
   
+  const closeModal = e => {
+      
+    if (e.code === 'Escape') {
+      return onClose();
+    }
+  };
+
   useEffect(() => {
     window.addEventListener('keydown', closeModal);
 
     return () => {
       window.removeEventListener('keydown', closeModal);
     };
-  }, [closeModal]);
+  }, []);
 
-  const closeModal = e => {
-      
-    if (e.code === 'Escape') {console.log("closeModal");
-      return onClose();
-    }
-  };
+  
 
   const clickOverlay = e => {
     
-    if (e.target.nodeName !== 'IMG') {console.log("clickOverlay");
+    if (e.target.nodeName !== 'IMG') { 
       return onClose();
     }
   };

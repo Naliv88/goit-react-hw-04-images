@@ -11,7 +11,7 @@ const Modal = ({largeImage}, onClose) => {
     return () => {
       window.removeEventListener('keydown', closeModal);
     };
-  }, []);
+  }, [closeModal]);
 
   const closeModal = e => {
       

@@ -19,12 +19,12 @@ export const App = () => {
 
   useEffect(() => {
     getImageList()
-  }, [])
+  }, [getImageList])
   
   useEffect(() => {
     getImageList()
     setPage(1)
-  }, [searchInput])
+  }, [searchInput,getImageList])
   
   
   const getImageList = async () => {

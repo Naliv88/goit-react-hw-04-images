@@ -3,40 +3,35 @@ import PropTypes from 'prop-types';
 
 import styles from './Modal.module.css';
 
-const Modal = ({ largeImage }, onClose) => {
-  
-  const closeModal = e => {
-      
-    if (e.code === 'Escape') {
-      return onClose();
-    }
-  };
-
+const Modal = ({ largeImage, onClose }) => {
   useEffect(() => {
+    const closeModal = e => {
+      if (e.code === 'Escape') {
+        return onClose();
+      }
+    };
+
     window.addEventListener('keydown', closeModal);
 
     return () => {
       window.removeEventListener('keydown', closeModal);
     };
-  }, []);
-
-  
+  }, [onClose]);
 
   const clickOverlay = e => {
-    
-    if (e.target.nodeName !== 'IMG') { 
+    if (e.target.nodeName !== 'IMG') {
       return onClose();
     }
   };
 
   return (
-      <div onClick={clickOverlay} className={styles.Overlay}>
-        <div className={styles.Modal}>
-          <img src={largeImage} alt="modalImg" />
-        </div>
+    <div onClick={clickOverlay} className={styles.Overlay}>
+      <div className={styles.Modal}>
+        <img src={largeImage} alt="modalImg" />
       </div>
-    );
-}
+    </div>
+  );
+};
 
 // export default class Modal extends Component {
 //   componentDidMount() {
@@ -75,4 +70,4 @@ Modal.propTypes = {
   largeImage: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
 };
-export default Modal
+export default Modal;

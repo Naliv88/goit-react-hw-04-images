@@ -31,14 +31,14 @@ export const App = () => {
 
   useEffect(() => {
     getImageList();
-  }, []);
+  }, []); //eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     console.log('object');
     setHits([])
     getImageList();
     setPage(1);
-  }, [searchInput]);
+  }, [searchInput]); //eslint-disable-line react-hooks/exhaustive-deps
 
   const onSubmit = data => {
     if (data === searchInput) {
@@ -54,16 +54,19 @@ export const App = () => {
   };
 
   const openModal = imageUrl => {
-    setModalImage(imageUrl);
     setIsCreateModalOpen(true);
+    setModalImage(imageUrl);
   };
 
   useEffect(() => {
+    console.log('222');
     const loadMore = async () => {
       setIsLoading(true);
       try {
         await getData(searchInput, page).then(data => {
+          console.log(hits);
           setHits([...hits, ...data.hits]);
+          console.log(hits);
           // setPage(page + 1);
         });
       } catch (error) {
@@ -73,7 +76,7 @@ export const App = () => {
       }
     };
     searchInput && loadMore()
-  }, [page]);
+  }, [page]); //eslint-disable-line react-hooks/exhaustive-deps
 
   const onLoadMoreClick = () => {
     setPage(page + 1);

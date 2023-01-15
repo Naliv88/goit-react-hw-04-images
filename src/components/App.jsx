@@ -12,11 +12,10 @@ export const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
-  const [page, setPage] = useState(()=>1);
+  const [page, setPage] = useState(() => 1);
   const [hits, setHits] = useState([]);
   const [modalImage, setModalImage] = useState('');
 
-  
   const getImageList = async () => {
     try {
       setIsLoading(true);
@@ -29,22 +28,14 @@ export const App = () => {
     }
   };
 
-  useEffect(() => {
-    getImageList();
-  }, []); //eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    console.log('object');
-    setHits([])
-    getImageList();
-    setPage(1);
-  }, [searchInput]); //eslint-disable-line react-hooks/exhaustive-deps
-
   const onSubmit = data => {
     if (data === searchInput) {
       return;
     }
     setPage(1);
+    setHits([]);
+
+    getImageList();
     setSearchInput(data);
   };
 
@@ -59,15 +50,11 @@ export const App = () => {
   };
 
   useEffect(() => {
-    console.log('222');
     const loadMore = async () => {
       setIsLoading(true);
       try {
         await getData(searchInput, page).then(data => {
-          console.log(hits);
           setHits([...hits, ...data.hits]);
-          console.log(hits);
-          // setPage(page + 1);
         });
       } catch (error) {
         console.error(error);
@@ -75,19 +62,20 @@ export const App = () => {
         setIsLoading(false);
       }
     };
-    searchInput && loadMore()
-  }, [page]); //eslint-disable-line react-hooks/exhaustive-deps
+    loadMore();
+  }, [page, searchInput]); //eslint-disable-line react-hooks/exhaustive-deps
 
   const onLoadMoreClick = () => {
     setPage(page + 1);
-    console.log("111");
   };
 
   return (
     <div className={style.App}>
       <Searchbar onSubmit={onSubmit} />
       {hits && <ImageGallery images={hits} onClick={openModal} />}
-      {hits !== null && !isLoading && <Button onClick={onLoadMoreClick} />}
+      {hits !== null && !isLoading && searchInput !== '' && (
+        <Button onClick={onLoadMoreClick} />
+      )}
       {isLoading && (
         <ThreeDots
           color="#3f51b5"
